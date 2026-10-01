@@ -1,0 +1,1 @@
+# domains blocked from being fetched through the proxy (one per line)

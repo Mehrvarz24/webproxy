@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وب‌پروکسی — مرور آزاد</title>
+<style>
+:root{--bg:#121212;--panel:#1a1a1a;--panel2:#222220;--cream:#f0e9d8;--muted:#9a937f;--gold:#c9a962;--gold2:#e6cf9a;--red:#d96c5f;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:Tahoma,'Segoe UI',ui-sans-serif,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.wrap{max-width:640px;width:100%;text-align:center}
+.logo{font-size:3rem;margin-bottom:.5rem}
+h1{color:var(--gold);font-weight:700;font-size:1.8rem;letter-spacing:.5px}
+.sub{color:var(--muted);margin:.5rem 0 2rem;font-size:.95rem;line-height:1.8}
+form{background:var(--panel);border:1px solid #2e2c26;border-radius:16px;padding:1.6rem;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.inputrow{display:flex;gap:.7rem}
+input{flex:1;background:var(--panel2);border:1px solid #3a362c;border-radius:12px;color:var(--cream);font-size:1.05rem;padding:.85rem 1rem;direction:ltr;text-align:left}
+input:focus{outline:1px solid var(--gold);border-color:var(--gold)}
+button{background:linear-gradient(135deg,var(--gold),#a68b4b);color:#121212;border:none;border-radius:12px;padding:.85rem 1.8rem;font-weight:700;font-size:1rem;cursor:pointer;white-space:nowrap;font-family:inherit}
+button:hover{filter:brightness(1.1)}
+.hint{color:var(--muted);font-size:.8rem;margin-top:1rem}
+#history{margin-top:2rem;text-align:right}
+#history h2{font-size:.85rem;color:var(--muted);font-weight:600;letter-spacing:.6px;margin-bottom:.7rem}
+#histlist{display:flex;flex-direction:column;gap:.5rem}
+#histlist a{background:var(--panel);border:1px solid #2e2c26;border-radius:10px;color:var(--cream);text-decoration:none;padding:.6rem 1rem;font-size:.9rem;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#histlist a:hover{border-color:var(--gold)}
+#histlist a span{color:var(--gold);margin-left:.5rem}
+footer{color:var(--muted);font-size:.75rem;margin-top:2.5rem}
+footer b{color:var(--gold)}
+@media(max-width:480px){.inputrow{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">🛰️</div>
+  <h1>وب‌پروکسی</h1>
+  <p class="sub">هر سایتی را آزاد و ناشناس مرور کنید — بدون فیلترشکن، مستقیم از مرورگر</p>
+  <form id="goform" action="/proxy" method="get">
+    <div class="inputrow">
+      <input id="url" name="url" type="text" placeholder="https://example.com" autocomplete="off" autofocus>
+      <button type="submit">برو ➜</button>
+    </div>
+    <p class="hint">🔗 آدرس سایت را وارد کنید</p>
+  </form>
+  <div id="history" hidden>
+    <h2>آخرین سایت‌های بازدیدشده</h2>
+    <div id="histlist"></div>
+  </div>
+  <footer>قدرت‌گرفته از <b>Atlas</b> · وب‌پروکسی میورس</footer>
+</div>
+<script>
+const form=document.getElementById('goform'),inp=document.getElementById('url');
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  let u=inp.value.trim();
+  if(!u)return;
+  if(!/^https?:\/\//i.test(u))u='https://'+u;
+  try{new URL(u)}catch(_){alert('آدرس نامعتبر است');return}
+  try{
+    let h=JSON.parse(localStorage.getItem('wp_history')||'[]');
+    h=h.filter(x=>x!==u);h.unshift(u);h=h.slice(0,5);
+    localStorage.setItem('wp_history',JSON.stringify(h));
+  }catch(_){}
+  location.href='/proxy?url='+encodeURIComponent(u);
+});
+function loadHist(){
+  let h;try{h=JSON.parse(localStorage.getItem('wp_history')||'[]')}catch(_){h=[]}
+  if(!h.length)return;
+  const box=document.getElementById('history'),list=document.getElementById('histlist');
+  box.hidden=false;list.innerHTML='';
+  h.forEach(u=>{
+    const a=document.createElement('a');a.href='/proxy?url='+encodeURIComponent(u);
+    a.innerHTML='<span>↗</span>';a.appendChild(document.createTextNode(u));
+    list.appendChild(a);
+  });
+}
+loadHist();
+</script>
+</body>
+</html>
